@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import "./App.css";
 
 const initialChallenges = [
@@ -11,16 +11,34 @@ const initialChallenges = [
 const categories = ["All", "Environment", "Education", "Accessibility", "Community"];
 
 function App() {
-  const [challenges, setChallenges] = useState(initialChallenges);
+  const [challenges, setChallenges] = useState(() => {
+  const saved = localStorage.getItem("impacthub-challenges");
+  return saved ? JSON.parse(saved) : initialChallenges;
+});
   const [activeCategory, setActiveCategory] = useState("All");
   const [search, setSearch] = useState("");
-  const [joined, setJoined] = useState([]);
+  const [joined, setJoined] = useState(() => {
+  const saved = localStorage.getItem("impacthub-joined");
+  return saved ? JSON.parse(saved) : [];
+});
   const [showForm, setShowForm] = useState(false);
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState("Education");
   const [description, setDescription] = useState("");
   const [notice, setNotice] = useState("");
+  useEffect(() => {
+  localStorage.setItem(
+    "impacthub-challenges",
+    JSON.stringify(challenges)
+  );
+}, [challenges]);
 
+useEffect(() => {
+  localStorage.setItem(
+    "impacthub-joined",
+    JSON.stringify(joined)
+  );
+}, [joined]);
   const visibleChallenges = useMemo(() => {
     return challenges.filter((challenge) => {
       const matchesCategory =
