@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import {supabase} from "./supabase";
 import "./App.css";
 
 const initialChallenges = [
@@ -12,6 +13,25 @@ const categories = ["All", "Environment", "Education", "Accessibility", "Communi
 
 function App() {
   const [challenges, setChallenges] = useState(() => {
+    useEffect(() => {
+  async function loadChallenges() {
+    const { data, error } = await supabase
+      .from("challenges")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Could not load challenges:", error.message);
+      return;
+    }
+
+    if (data && data.length > 0) {
+      setChallenges(data);
+    }
+  }
+
+  loadChallenges();
+}, []);
   const saved = localStorage.getItem("impacthub-challenges");
   return saved ? JSON.parse(saved) : initialChallenges;
 });
@@ -26,6 +46,34 @@ function App() {
   const [category, setCategory] = useState("Education");
   const [description, setDescription] = useState("");
   const [notice, setNotice] = useState("");
+  const [apiIdeas, setApiIdeas] = useState([]);
+  const [apiLoading, setApiLoading] = useState(false);
+  const [apiError, setApiError] = useState("");
+  useEffect(() => {
+  async function loadIdeas() {
+    setApiLoading(true);
+    setApiError("");
+
+    try {
+      const response = await fetch(
+        "https://jsonplaceholder.typicode.com/posts?_limit=5"
+      );
+
+      if (!response.ok) {
+        throw new Error("Could not load ideas.");
+      }
+
+      const data = await response.json();
+      setApiIdeas(data);
+    } catch (error) {
+      setApiError("Couldn't load ideas. Please try again.");
+    } finally {
+      setApiLoading(false);
+    }
+  }
+
+  loadIdeas();
+}, []);
   useEffect(() => {
   localStorage.setItem(
     "impacthub-challenges",
@@ -250,6 +298,43 @@ useEffect(() => {
             </div>
           )}
         </section>
+
+        <section className="api-section">
+  <div className="eyebrow">LIVE API DEMO</div>
+  <h2>Ideas from the internet</h2>
+  <p className="api-description">
+    These sample posts are fetched from a public API to demonstrate how
+    ImpactHub can connect to external data sources.
+  </p>
+
+  {apiLoading && <p>Loading ideas...</p>}
+
+  {apiError && (
+    <div className="notice" role="alert">
+      {apiError}
+      <button
+        onClick={() => window.location.reload()}
+        aria-label="Retry loading ideas"
+      >
+        Retry
+      </button>
+    </div>
+  )}
+
+  {!apiLoading && !apiError && (
+    <div className="api-grid">
+      {apiIdeas.map((idea) => (
+        <article className="api-card" key={idea.id}>
+          <span className="api-number">
+            IDEA {String(idea.id).padStart(2, "0")}
+          </span>
+          <h3>{idea.title}</h3>
+          <p>{idea.body}</p>
+        </article>
+      ))}
+    </div>
+  )}
+</section>
 
         <section className="my-work-section" id="my-work">
           <div>
