@@ -1036,3 +1036,54 @@ button {
     margin-left: 0;
   }
 }
+.api-section {
+  margin-top: 38px;
+}
+
+.api-description {
+  color: #81869b;
+  font-size: 12px;
+  line-height: 1.8;
+  max-width: 600px;
+}
+
+.api-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.api-card {
+  background: #fff;
+  border: 1px solid #ececf3;
+  border-radius: 13px;
+  padding: 20px;
+  min-width: 0;
+}
+
+.api-number {
+  color: #6557e8;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.api-card h3 {
+  font-size: 14px;
+  line-height: 1.6;
+  text-transform: capitalize;
+}
+
+.api-card p {
+  color: #81869b;
+  font-size: 12px;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 760px) {
+  .api-grid {
+    grid-template-columns: 1fr;
+  }
+}
